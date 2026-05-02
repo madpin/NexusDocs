@@ -431,21 +431,21 @@ OUTPUT: RenderedView {
 
 ```
 SOURCE CONNECTORS              EXTRACTION ENGINE            GRAPH POPULATION
-┌─────────────────┐           ┌──────────────────┐         ┌───────────────┐
+┌──────────────────┐           ┌──────────────────┐         ┌───────────────┐
 │ Git Repos        │──README──▶│                  │──────▶  │ Create/Update │
-│ (README, ADR,   │──code───▶ │  LLM Extractor   │         │ Entities      │
+│ (README, ADR,    │──code───▶ │  LLM Extractor   │         │ Entities      │
 │  docker-compose, │──config─▶ │                  │         │               │
 │  k8s manifests)  │           │  Schema-guided   │──────▶  │ Create/Update │
-├─────────────────┤           │  extraction with  │         │ Relationships │
-│ Confluence       │──pages──▶ │  confidence       │         │               │
-├─────────────────┤           │  scoring          │──────▶  │ Create/Update │
+├──────────────────┤           │  extraction with │         │ Relationships │
+│ Confluence       │──pages──▶ │  confidence      │         │               │
+├──────────────────┤           │  scoring         │──────▶  │ Create/Update │
 │ JIRA             │──tickets─▶│                  │         │ DocFragments  │
-├─────────────────┤           │                  │         │               │
+├──────────────────┤           │                  │         │               │
 │ API Specs        │──openapi─▶│                  │         │ With          │
 │ (OpenAPI, Proto) │──proto──▶ │                  │         │ provenance &  │
-├─────────────────┤           └──────────────────┘         │ confidence    │
+├──────────────────┤           └──────────────────┘         │ confidence    │
 │ Backstage Catalog│──yaml───▶                              └───────────────┘
-└─────────────────┘
+└──────────────────┘
 ```
 
 **Ingestion steps:**
