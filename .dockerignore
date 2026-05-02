@@ -1,0 +1,16 @@
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+**/node_modules
+frontend/dist
+frontend/.vite
+# The lockfile on the host may have been generated against a private
+# registry. Inside the container, we re-generate against the public
+# registry from package.json instead. Drop both to keep the build
+# reproducible across machines.
+frontend/package-lock.json
+.git
+*.log
+.env

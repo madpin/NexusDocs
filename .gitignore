@@ -1,0 +1,98 @@
+# ─── Python ───────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+.eggs/
+build/
+dist/
+.installed.cfg
+
+# Virtual envs
+.venv/
+venv/
+env/
+.python-version
+
+# Tests / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+.cache/
+.benchmarks/
+
+# Type / lint caches
+.mypy_cache/
+.pyright/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+
+# ─── Node / Frontend ──────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm/
+.yarn/cache
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Vite / build output
+frontend/dist/
+frontend/.vite/
+frontend/.parcel-cache/
+frontend/coverage/
+frontend/playwright-report/
+frontend/.turbo/
+
+# Generated API types (regenerated via `npm run gen:api`)
+frontend/src/api/schema.d.ts
+
+# ─── Environment / secrets ───────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+.secrets/
+
+# ─── IDE / Editor ─────────────────────────────────────────────────────────
+.vscode/
+!.vscode/settings.json.example
+.idea/
+*.iml
+*.swp
+*.swo
+*~
+.cursor/cli-config.json
+
+# ─── OS ───────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ─── Docker / Compose ─────────────────────────────────────────────────────
+docker-compose.override.yml
+.docker/
+
+# ─── Logs ─────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── Project artefacts ────────────────────────────────────────────────────
+backend/.openapi.json
+*.tmp
+*.bak
+.scratch/

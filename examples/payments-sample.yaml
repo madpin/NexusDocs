@@ -1,0 +1,463 @@
+# Sample NexusDocs graph for the Payments domain. See docs/examples/sample-graph.md.
+# ─── ORGANIZATION ────────────────────────────────────────────────────────────
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: company.acme
+  type: company
+  name: Acme Corp
+  metadata:
+    headquarters: "Austin, TX"
+    domain: acme.com
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: division.fintech
+  type: division
+  name: Fintech
+  parent: company.acme
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: team.payments
+  type: team
+  name: Team Payments
+  parent: division.fintech
+  metadata:
+    slack_channel: "#team-payments"
+    on_call_rotation: "pagerduty:team-payments"
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: team.identity
+  type: team
+  name: Team Identity
+  parent: division.fintech
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: person.tpinto
+  type: person
+  name: Thiago M Pinto
+  metadata:
+    role: "Principal Developer"
+    email: tpinto@acme.com
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: person.aboss
+  type: person
+  name: Alex Boss
+  metadata:
+    role: "Engineering Manager"
+    email: aboss@acme.com
+
+# ─── SYSTEMS & SERVICES ──────────────────────────────────────────────────────
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: system.identity-platform
+  type: system
+  name: Identity Platform
+  labels: [tier-1, customer-facing]
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: service.auth
+  type: service
+  name: Auth Service
+  parent: system.identity-platform
+  labels: [authentication, tier-1]
+  metadata:
+    technology: "Node.js / Express"
+    repository: "https://gitlab.com/acme/auth-service"
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: component.token-issuer
+  type: component
+  name: TokenIssuer
+  parent: service.auth
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: class.jwt-signer
+  type: class
+  name: JwtSigner
+  parent: component.token-issuer
+  metadata:
+    file: "src/auth/jwt.ts"
+    line_start: 42
+    line_end: 178
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: endpoint.auth.verify-session
+  type: api_endpoint
+  name: POST /api/v2/verify-session
+  parent: service.auth
+  metadata:
+    method: POST
+    path: /api/v2/verify-session
+    auth: oauth2
+    rate_limit: "500 req/s per consumer"
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: service.payments-api
+  type: service
+  name: Payments API
+  labels: [tier-1, pci]
+  metadata:
+    technology: "Go / Echo"
+    repository: "https://gitlab.com/acme/payments-api"
+
+# ─── INFRASTRUCTURE ──────────────────────────────────────────────────────────
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: kafka_cluster.core-kafka-prod
+  type: kafka_cluster
+  name: Core Kafka (prod)
+  labels: [tier-1, shared, kafka]
+  metadata:
+    region: "us-east-1"
+    broker_count: 9
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: topic.user-events
+  type: kafka_topic
+  name: user.events.v1
+  parent: kafka_cluster.core-kafka-prod
+  labels: [pii, kafka]
+  metadata:
+    partitions: 12
+    retention_days: 7
+    avg_throughput: "1200 msgs/sec"
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: topic.order-events
+  type: kafka_topic
+  name: order.events.v1
+  parent: kafka_cluster.core-kafka-prod
+  labels: [orders, kafka]
+  metadata:
+    partitions: 12
+    retention_days: 14
+
+---
+apiVersion: nexusdocs/v1
+kind: Entity
+spec:
+  id: database.transactions
+  type: database
+  name: Transactions DB
+  labels: [tier-1, postgres]
+  metadata:
+    engine: postgres
+    version: "15"
+    pii: false
+
+# ─── ORGANIZATIONAL RELATIONSHIPS ────────────────────────────────────────────
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.tpinto-member-of-payments
+  source: person.tpinto
+  target: team.payments
+  type: member_of
+  metadata:
+    since: "2024-01-01"
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.aboss-member-of-payments
+  source: person.aboss
+  target: team.payments
+  type: member_of
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.aboss-leads-payments
+  source: person.aboss
+  target: team.payments
+  type: leads
+  metadata:
+    role: engineering_manager
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.tpinto-reports-to-aboss
+  source: person.tpinto
+  target: person.aboss
+  type: reports_to
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.payments-owns-payments-api
+  source: team.payments
+  target: service.payments-api
+  type: owns
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.payments-owns-transactions-db
+  source: team.payments
+  target: database.transactions
+  type: owns
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.identity-owns-auth
+  source: team.identity
+  target: service.auth
+  type: owns
+
+# ─── TECHNICAL & DATA-FLOW RELATIONSHIPS ─────────────────────────────────────
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.auth-provides-verify-session
+  source: service.auth
+  target: endpoint.auth.verify-session
+  type: provides_api
+  protocol: rest
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.payments-api-calls-auth
+  source: service.payments-api
+  target: service.auth
+  type: calls_api
+  protocol: rest
+  mode: sync
+  metadata:
+    method: POST
+    path: /api/v2/verify-session
+    auth: oauth2
+    timeout_ms: 3000
+    circuit_breaker: true
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.auth-publishes-user-events
+  source: service.auth
+  target: topic.user-events
+  type: publishes_to
+  protocol: kafka
+  mode: async
+  metadata:
+    key_schema: user_id
+    value_format: avro
+    avg_throughput: "1200 msgs/sec"
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.payments-publishes-order-events
+  source: service.payments-api
+  target: topic.order-events
+  type: publishes_to
+  protocol: kafka
+  mode: async
+  metadata:
+    key_schema: order_id
+    value_format: avro
+
+---
+apiVersion: nexusdocs/v1
+kind: Relationship
+spec:
+  id: rel.payments-writes-transactions
+  source: service.payments-api
+  target: database.transactions
+  type: writes_to
+  protocol: postgres
+  mode: sync
+  metadata:
+    tables: [transactions, invoices, payment_methods]
+    transactional: true
+
+# ─── DOC FRAGMENTS ───────────────────────────────────────────────────────────
+
+---
+apiVersion: nexusdocs/v1
+kind: DocFragment
+spec:
+  id: docfrag.payments-team-overview
+  title: "Team Payments — what we do"
+  body: |
+    Team Payments builds and operates the billing platform for Acme.
+    We own `service.payments-api`, the `transactions` Postgres database,
+    and publish to `order.events.v1` on the core Kafka cluster.
+  subjects:
+    - entity: team.payments
+  tags: [onboarding]
+  coverage:
+    zoom_min: 15
+    zoom_max: 40
+    lenses: [product, onboarding]
+    granularity: team
+    lift_on:
+      path_match: true
+    lift_by: 5
+  provenance:
+    source_type: manual
+    generated_by: human
+    confidence: 1.0
+    reviewed: true
+
+---
+apiVersion: nexusdocs/v1
+kind: DocFragment
+spec:
+  id: docfrag.payments-auth-failure-mode
+  title: "Failure modes: Payments → Auth REST"
+  body: |
+    Auth Service rate-limits to 500 req/s per consumer. Circuit breaker
+    trips after 3 consecutive 429s and opens for 30s. On a 401, the token
+    is stale — refresh via `/oauth/refresh` before retrying.
+  relations:
+    - rel: rel.payments-api-calls-auth
+  tags: [rate-limiting, debug]
+  coverage:
+    zoom_min: 50
+    zoom_max: 85
+    lenses: [debug, operations]
+    granularity: service
+    lift_on:
+      path_match: true
+    lift_by: 15
+  provenance:
+    source_type: manual
+    generated_by: human
+    confidence: 1.0
+    reviewed: true
+
+---
+apiVersion: nexusdocs/v1
+kind: DocFragment
+spec:
+  id: docfrag.kafka-throughput-ceiling
+  title: "Kafka publisher throughput ceiling"
+  body: |
+    `core-kafka-prod` is sized for ~50k msgs/sec aggregate. Individual
+    topics are capped at 8k msgs/sec by the cluster-wide quota. If you
+    need more, request a partition rebalance from team-platform-data.
+  subjects:
+    - entity: kafka_cluster.core-kafka-prod
+  tags: [kafka, platform-standards, throughput]
+  coverage:
+    zoom_min: 50
+    zoom_max: 85
+    lenses: [technical, operations, debug]
+    granularity: system
+    lift_on:
+      cluster_coverage_threshold: 0.5
+      path_match: true
+    lift_by: 20
+  provenance:
+    source_type: runbook
+    source_path: "https://wiki.acme.com/runbooks/kafka#throughput"
+    generated_by: hybrid
+    confidence: 0.95
+    reviewed: true
+
+---
+apiVersion: nexusdocs/v1
+kind: DocFragment
+spec:
+  id: docfrag.payments-api-local-setup
+  title: "Payments API — local setup"
+  body: |
+    1. Clone the repo.
+    2. `make bootstrap` installs Go and seeds a local Postgres.
+    3. `make run-local` starts the API on `:8080` with mocked Kafka.
+    Set `OAUTH_CLIENT_ID` from your dev tenant before authenticating.
+  subjects:
+    - entity: service.payments-api
+  tags: [onboarding, golang]
+  coverage:
+    zoom_min: 40
+    zoom_max: 80
+    lenses: [onboarding, technical]
+    granularity: service
+    lift_on:
+      path_match: true
+    lift_by: 10
+  provenance:
+    source_type: readme
+    source_path: "https://gitlab.com/acme/payments-api/-/blob/main/README.md#L42-L78"
+    generated_by: llm
+    confidence: 0.78
+    reviewed: false
+
+# ─── A VIEW PRESET ───────────────────────────────────────────────────────────
+
+---
+apiVersion: nexusdocs/v1
+kind: ViewPreset
+spec:
+  id: preset.payments-oncall-debug
+  name: "Payments on-call: debug"
+  owner: person.tpinto
+  shared_with:
+    - team.payments
+  focus: service.payments-api
+  zoom: 65
+  lenses: [debug, operations]
+  radius: 2
+  filters:
+    protocols: [rest, kafka, postgres]
+    tags: [tier-1]
