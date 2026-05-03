@@ -20,6 +20,7 @@ There are several entry points depending on what you need:
 
 | If you want to...                                            | Start here                                      |
 | ------------------------------------------------------------ | ----------------------------------------------- |
+| **Just use NexusDocs (UI + CLI walkthrough w/ screenshots)** | [**`USAGE.md`**](./USAGE.md)                    |
 | Understand the mental model (graph, zoom, lenses, topology) | [`concepts/`](./concepts/README.md)             |
 | Look up an entity type (Service, KafkaTopic, Person, …)     | [`entities/`](./entities/README.md)             |
 | Look up a relationship type (`publishes_to`, `calls_api`, …) | [`relationships/`](./relationships/README.md)   |
@@ -35,6 +36,8 @@ There are several entry points depending on what you need:
 ```
 docs/
 ├── README.md                        # This file
+├── USAGE.md                         # Step-by-step UI + CLI walkthrough w/ screenshots
+├── images/                          # Screenshots used by README.md and USAGE.md
 │
 ├── concepts/                        # The mental model
 │   ├── README.md                    # Concept index
